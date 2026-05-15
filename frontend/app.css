@@ -1,0 +1,306 @@
+:root{
+  --bg0:#0a0d1f;
+  --bg1:#0f172a;
+  --primary:#00c6ff;
+  --secondary:#7c3aed;
+  --glow:rgba(0,198,255,0.6);
+  --text:#e6eaff;
+  --muted:rgba(230,234,255,0.72);
+  --border:rgba(255,255,255,0.10);
+  --glass:rgba(255,255,255,0.06);
+  --glass-strong:rgba(255,255,255,0.09);
+  --shadow:0 0 20px rgba(0,0,0,0.35);
+}
+
+html, body{
+  height:100%;
+}
+
+body{
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(124,58,237,0.35), transparent 60%),
+    radial-gradient(700px 400px at 85% 0%, rgba(0,198,255,0.28), transparent 55%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
+  color:var(--text);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing:0.2px;
+  overflow-x:hidden;
+}
+
+/* subtle animated noise/shine layer */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(600px 280px at 50% 0%, rgba(255,255,255,0.06), transparent 70%),
+    linear-gradient(120deg, rgba(255,255,255,0.04), transparent 40%, rgba(255,255,255,0.03));
+  mix-blend-mode:overlay;
+  opacity:0.55;
+}
+
+/* Typography */
+h1,h2,h3,h4,h5{
+  color:var(--text);
+  text-shadow:0 0 18px rgba(0,198,255,0.10);
+}
+
+.text-muted, .muted{
+  color:var(--muted) !important;
+}
+
+/* Links */
+a{
+  color:rgba(255,255,255,0.92);
+}
+a:hover{
+  color:var(--primary);
+}
+
+/* Glass surfaces */
+.glass,
+.flight-card,
+.panel,
+.card,
+.list-group-item,
+.ac-dropdown,
+.seat-map-wrap,
+.plane,
+.flight-info,
+.flight-strip{
+  background:var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+
+.flight-card,
+.panel,
+.card,
+.list-group-item,
+.plane,
+.flight-info,
+.flight-strip{
+  border-radius:18px;
+}
+
+.flight-card:hover,
+.panel:hover,
+.card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 0 24px rgba(0,0,0,0.45), 0 0 18px rgba(0,198,255,0.12);
+}
+
+.flight-card,
+.panel,
+.card{
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+/* Navbar (generated in common.js) */
+.navbar{
+  background: rgba(10,13,31,0.45) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.navbar .navbar-brand{
+  font-weight:700;
+  letter-spacing:0.4px;
+  color:rgba(255,255,255,0.95) !important;
+  text-shadow: 0 0 16px rgba(0,198,255,0.18);
+}
+
+/* Buttons */
+.btn{
+  border-radius:12px;
+  transition: transform .22s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease;
+}
+
+.btn-primary,
+.buy-btn{
+  border:none !important;
+  background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+  color: rgba(255,255,255,0.95) !important;
+  border-radius:12px;
+}
+
+.btn-primary:hover,
+.buy-btn:hover{
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 0 18px var(--glow), 0 0 28px rgba(124,58,237,0.25);
+}
+
+.btn-outline-light{
+  background: rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.14) !important;
+  color: rgba(255,255,255,0.88) !important;
+}
+.btn-outline-light:hover{
+  transform: translateY(-1px);
+  border-color: rgba(0,198,255,0.45) !important;
+  box-shadow: 0 0 14px rgba(0,198,255,0.22);
+}
+
+/* Active nav item: common.js uses .btn-light */
+.btn-light{
+  border:1px solid rgba(0,198,255,0.35) !important;
+  background: rgba(0,198,255,0.10) !important;
+  color: rgba(255,255,255,0.95) !important;
+  box-shadow: 0 0 14px rgba(0,198,255,0.18);
+}
+
+.btn-outline-warning{
+  border-radius:12px;
+  background: rgba(124,58,237,0.10) !important;
+  border:1px solid rgba(124,58,237,0.35) !important;
+  color: rgba(255,255,255,0.92) !important;
+}
+.btn-outline-warning:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(124,58,237,0.28);
+}
+
+/* Forms */
+.form-control,
+.form-select{
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: rgba(255,255,255,0.90) !important;
+  border-radius: 14px !important;
+}
+.form-control::placeholder{
+  color: rgba(230,234,255,0.55) !important;
+}
+.form-control:focus,
+.form-select:focus{
+  box-shadow: 0 0 0 0.25rem rgba(0,198,255,0.20) !important;
+  border-color: rgba(0,198,255,0.35) !important;
+}
+label.form-label{
+  color: rgba(230,234,255,0.75);
+}
+
+/* Autocomplete dropdown */
+.ac-wrap{
+  position: relative;
+  z-index: 50;
+}
+.ac-dropdown{
+  z-index: 2000;
+  background: rgba(10,13,31,0.72) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+.ac-item:hover{
+  background: rgba(0,198,255,0.08) !important;
+}
+.ac-item .meta,
+.ac-empty{
+  color: rgba(230,234,255,0.70) !important;
+}
+
+/* ensure cards don't cover dropdown due to stacking contexts */
+.flight-card{
+  position: relative;
+  z-index: 1;
+}
+
+/* Flights search panel should sit above results grid */
+.search-panel{
+  position: relative;
+  z-index: 100;
+}
+#flights{
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero/header blocks */
+.hero,
+.header{
+  background:
+    radial-gradient(800px 220px at 50% 0%, rgba(0,198,255,0.25), transparent 70%),
+    linear-gradient(135deg, rgba(0,198,255,0.18), rgba(124,58,237,0.18));
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Seat map */
+.nose{
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.seat{
+  background: rgba(0,198,255,0.14);
+  border: 1px solid rgba(0,198,255,0.25);
+  color: rgba(255,255,255,0.92);
+  box-shadow: inset 0 0 0 rgba(0,0,0,0);
+}
+.seat:hover{
+  box-shadow: 0 0 14px rgba(0,198,255,0.25);
+}
+.seat.available{
+  background: rgba(0,198,255,0.14) !important;
+}
+.seat.occupied,
+.occupied{
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  color: rgba(230,234,255,0.55) !important;
+}
+.seat.selected,
+.selected{
+  background: linear-gradient(135deg, rgba(0,198,255,0.35), rgba(124,58,237,0.35)) !important;
+  border-color: rgba(0,198,255,0.35) !important;
+  box-shadow: 0 0 18px rgba(0,198,255,0.25);
+}
+
+.legend .dot-free{ background: rgba(0,198,255,0.9) !important; }
+.legend .dot-busy{ background: rgba(255,255,255,0.25) !important; }
+.legend .dot-picked{ background: rgba(124,58,237,0.85) !important; }
+
+/* Lists */
+.list-group-item{
+  color: rgba(255,255,255,0.88);
+}
+
+/* Admin/reference cards: fix bootstrap light header/body colors */
+.card-header{
+  background: rgba(255,255,255,0.06) !important;
+  color: rgba(255,255,255,0.92) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+}
+.card-body{
+  background: transparent !important;
+  color: rgba(255,255,255,0.88);
+}
+.card-body.border-bottom{
+  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+}
+.list-group-flush > .list-group-item{
+  border-width: 0 0 1px 0 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  border-radius: 0 !important;
+}
+
+hr{
+  border-color: rgba(255,255,255,0.12) !important;
+  opacity: 1;
+}
+
+/* Small helpers */
+.shadow-sm{
+  box-shadow: var(--shadow) !important;
+}
+
+/* Reduce motion (accessibility) */
+@media (prefers-reduced-motion: reduce){
+  *{
+    transition:none !important;
+    animation:none !important;
+  }
+}
+

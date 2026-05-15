@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Админ</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="app.css" rel="stylesheet">
+<style>
+</style>
+</head>
+<body>
+<div id="app-navbar"></div>
+
+<div class="container mt-4">
+<h2 class="mb-3"><i class="fa-solid fa-screwdriver-wrench"></i> Админ-режим: добавить рейс</h2>
+
+<div class="row g-2 mb-3">
+  <div class="col-md-3"><input id="num" class="form-control" maxlength="10" placeholder="Номер рейса (до 10 символов)"></div>
+  <div class="col-md-2"><input id="depAirportId" class="form-control" type="number" placeholder="ID вылета"></div>
+  <div class="col-md-2"><input id="arrAirportId" class="form-control" type="number" placeholder="ID прилета"></div>
+  <div class="col-md-2"><input id="price" class="form-control" type="number" step="0.01" placeholder="Цена"></div>
+  <div class="col-md-3"><input id="depTime" class="form-control" type="datetime-local" placeholder="Вылет"></div>
+</div>
+<div class="row g-2 mb-3">
+  <div class="col-md-3"><input id="arrTime" class="form-control" type="datetime-local" placeholder="Прилет"></div>
+  <div class="col-md-2"><input id="airlineId" class="form-control" type="number" value="1" placeholder="ID авиакомпании"></div>
+  <div class="col-md-2"><input id="aircraftId" class="form-control" type="number" value="1" placeholder="ID самолета"></div>
+</div>
+
+<button class="btn btn-primary" onclick="addFlight()">Добавить рейс</button>
+<div id="msg" class="mt-3"></div>
+
+<hr class="my-4">
+<h3 class="mb-3">Управление рейсами</h3>
+<div id="flightsAdminList" class="list-group"></div>
+
+<hr class="my-4">
+<h3 class="mb-3">Управление билетами</h3>
+<div id="ticketsAdminList" class="list-group"></div>
+
+<hr class="my-4">
+<h3 class="mb-3">Справочники ID</h3>
+<p class="text-muted mb-2">Используй эти ID при добавлении рейса.</p>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header fw-bold">Авиалинии</div>
+      <div class="card-body border-bottom">
+        <div class="mb-2"><input id="newAirlineName" class="form-control form-control-sm" placeholder="Название авиалинии"></div>
+        <div class="mb-2"><input id="newAirlineCountry" class="form-control form-control-sm" placeholder="Страна"></div>
+        <button class="btn btn-sm btn-primary" onclick="addAirline()">Добавить авиалинию</button>
+      </div>
+      <div id="airlinesRef" class="list-group list-group-flush"></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header fw-bold">Самолеты</div>
+      <div class="card-body border-bottom">
+        <div class="mb-2"><input id="newAircraftType" class="form-control form-control-sm" placeholder="Тип (Airbus A321)"></div>
+        <div class="mb-2"><input id="newAircraftReg" class="form-control form-control-sm" placeholder="Рег. номер (RA-12345)"></div>
+        <div class="mb-2"><input id="newAircraftAirlineId" class="form-control form-control-sm" type="number" placeholder="ID авиалинии"></div>
+        <div class="mb-2"><input id="newAircraftTotalSeats" class="form-control form-control-sm" type="number" placeholder="Всего мест"></div>
+        <button class="btn btn-sm btn-primary" onclick="addAircraft()">Добавить самолет</button>
+      </div>
+      <div id="aircraftsRef" class="list-group list-group-flush"></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header fw-bold">Аэропорты</div>
+      <div class="card-body border-bottom">
+        <div class="mb-2"><input id="newAirportName" class="form-control form-control-sm" placeholder="Название аэропорта"></div>
+        <div class="mb-2"><input id="newAirportCity" class="form-control form-control-sm" placeholder="Город"></div>
+        <div class="mb-2"><input id="newAirportCountry" class="form-control form-control-sm" placeholder="Страна"></div>
+        <button class="btn btn-sm btn-primary" onclick="addAirport()">Добавить аэропорт</button>
+      </div>
+      <div id="airportsRef" class="list-group list-group-flush"></div>
+    </div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+renderNavbar({ active: 'admin.html' });
+if(!requireAdmin()){
+  throw new Error('unauthorized');
+}
+
+function setMsg(text, ok){
+  const el = document.getElementById('msg');
+  el.className = ok ? 'alert alert-success mt-3' : 'alert alert-danger mt-3';
+  el.textContent = text;
+}
+
+function toIsoLocal(value){
+  if(!value) return '';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? '' : d.toISOString();
+}
+
+async function addFlight(){
+  try{
+    const payload = await apiPost('/admin/flights', {
+      flight_number: document.getElementById('num').value.trim(),
+      departure_airport_id: Number(document.getElementById('depAirportId').value),
+      arrival_airport_id: Number(document.getElementById('arrAirportId').value),
+      scheduled_departure: toIsoLocal(document.getElementById('depTime').value),
+      scheduled_arrival: toIsoLocal(document.getElementById('arrTime').value),
+      base_price: Number(document.getElementById('price').value),
+      airline_id: Number(document.getElementById('airlineId').value),
+      aircraft_id: Number(document.getElementById('aircraftId').value)
+    });
+    setMsg(`Рейс ${payload.flight.flight_number} добавлен (ID ${payload.flight.flight_id})`, true);
+    await loadFlightsForAdmin();
+  } catch (e){
+    setMsg(e.message || 'Не удалось добавить рейс', false);
+  }
+}
+
+async function deleteFlight(flightId, flightNumber){
+  const ok = window.confirm(`Удалить рейс ${flightNumber} (ID ${flightId})?`);
+  if(!ok) return;
+  try{
+    await apiRequest(`/admin/flights/${flightId}`, { method: 'DELETE' });
+    setMsg(`Рейс ${flightNumber} удален`, true);
+    await loadFlightsForAdmin();
+  }catch(e){
+    setMsg(e.message || 'Не удалось удалить рейс', false);
+  }
+}
+
+async function deleteTicket(ticketId, ticketNumber){
+  const ok = window.confirm(`Удалить билет ${ticketNumber} (ID ${ticketId})? Бронь и оплата также будут удалены.`);
+  if(!ok) return;
+  try{
+    await apiRequest(`/admin/tickets/${ticketId}`, { method: 'DELETE' });
+    setMsg(`Билет ${ticketNumber} удален`, true);
+    await loadTicketsForAdmin();
+  }catch(e){
+    setMsg(e.message || 'Не удалось удалить билет', false);
+  }
+}
+
+async function loadFlightsForAdmin(){
+  const container = document.getElementById('flightsAdminList');
+  try{
+    const flights = await apiGet('/flights');
+    if(!flights.length){
+      container.innerHTML = '<div class="text-muted">Рейсы не найдены</div>';
+      return;
+    }
+    container.innerHTML = flights.map((f) => `
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>${f.flight_number}</strong>
+          <div class="small text-muted">
+            ${f.departure_city} -> ${f.arrival_city},
+            ${new Date(f.scheduled_departure).toLocaleString('ru-RU')}
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteFlight(${f.flight_id}, '${f.flight_number}')">Удалить</button>
+      </div>
+    `).join('');
+  }catch(e){
+    container.innerHTML = '<div class="text-danger">Не удалось загрузить список рейсов</div>';
+  }
+}
+
+async function loadTicketsForAdmin(){
+  const container = document.getElementById('ticketsAdminList');
+  try{
+    const tickets = await apiGet('/admin/tickets');
+    if(!tickets.length){
+      container.innerHTML = '<div class="text-muted">Билеты не найдены</div>';
+      return;
+    }
+    container.innerHTML = tickets.map((t) => `
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>Билет ${t.ticket_number}</strong>
+          <div class="small text-muted">
+            Рейс ${t.flight_number}, место ${t.seat_number}, пассажир: ${(t.first_name || '')} ${(t.last_name || '')} (${t.user_email || 'без email'})
+          </div>
+          <div class="small text-muted">
+            Бронь ${t.booking_reference}, ${new Date(t.booking_date).toLocaleString('ru-RU')}
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteTicket(${t.ticket_id}, '${t.ticket_number}')">Удалить</button>
+      </div>
+    `).join('');
+  }catch(e){
+    container.innerHTML = '<div class="text-danger">Не удалось загрузить список билетов</div>';
+  }
+}
+
+async function loadReferenceData(){
+  const airlinesEl = document.getElementById('airlinesRef');
+  const aircraftsEl = document.getElementById('aircraftsRef');
+  const airportsEl = document.getElementById('airportsRef');
+  try{
+    const refs = await apiGet('/admin/reference-data');
+
+    airlinesEl.innerHTML = (refs.airlines || []).map((a) => `
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <div><strong>ID ${a.airline_id}</strong> — ${a.airline_name}</div>
+            <div class="small text-muted">${a.country}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteAirline(${a.airline_id})">Удалить</button>
+        </div>
+      </div>
+    `).join('') || '<div class="list-group-item text-muted">Нет данных</div>';
+
+    aircraftsEl.innerHTML = (refs.aircrafts || []).map((a) => `
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <div><strong>ID ${a.aircraft_id}</strong> — ${a.aircraft_type}</div>
+            <div class="small text-muted">Борт: ${a.registration_number}, ID авиалинии: ${a.airline_id}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteAircraft(${a.aircraft_id})">Удалить</button>
+        </div>
+      </div>
+    `).join('') || '<div class="list-group-item text-muted">Нет данных</div>';
+
+    airportsEl.innerHTML = (refs.airports || []).map((a) => `
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <div><strong>ID ${a.airport_id}</strong> — ${a.city}</div>
+            <div class="small text-muted">${a.airport_name}, ${a.country}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteAirport(${a.airport_id})">Удалить</button>
+        </div>
+      </div>
+    `).join('') || '<div class="list-group-item text-muted">Нет данных</div>';
+  }catch(e){
+    const err = '<div class="list-group-item text-danger">Не удалось загрузить справочники</div>';
+    airlinesEl.innerHTML = err;
+    aircraftsEl.innerHTML = err;
+    airportsEl.innerHTML = err;
+  }
+}
+
+async function addAirline(){
+  try{
+    const payload = await apiPost('/admin/airlines', {
+      airline_name: document.getElementById('newAirlineName').value.trim(),
+      country: document.getElementById('newAirlineCountry').value.trim()
+    });
+    setMsg(`Авиалиния добавлена: ID ${payload.airline.airline_id}`, true);
+    await loadReferenceData();
+  }catch(e){
+    setMsg(e.message || 'Не удалось добавить авиалинию', false);
+  }
+}
+
+async function deleteAirline(airlineId){
+  const ok = window.confirm(`Удалить авиалинию ID ${airlineId}?`);
+  if(!ok) return;
+  try{
+    await apiRequest(`/admin/airlines/${airlineId}`, { method: 'DELETE' });
+    setMsg(`Авиалиния ID ${airlineId} удалена`, true);
+    await loadReferenceData();
+  }catch(e){
+    setMsg(e.message || 'Не удалось удалить авиалинию', false);
+  }
+}
+
+async function addAircraft(){
+  try{
+    const payload = await apiPost('/admin/aircrafts', {
+      aircraft_type: document.getElementById('newAircraftType').value.trim(),
+      registration_number: document.getElementById('newAircraftReg').value.trim(),
+      airline_id: Number(document.getElementById('newAircraftAirlineId').value),
+      total_seats: Number(document.getElementById('newAircraftTotalSeats').value)
+    });
+    setMsg(`Самолет добавлен: ID ${payload.aircraft.aircraft_id}`, true);
+    await loadReferenceData();
+  }catch(e){
+    setMsg(e.message || 'Не удалось добавить самолет', false);
+  }
+}
+
+async function deleteAircraft(aircraftId){
+  const ok = window.confirm(`Удалить самолет ID ${aircraftId}?`);
+  if(!ok) return;
+  try{
+    await apiRequest(`/admin/aircrafts/${aircraftId}`, { method: 'DELETE' });
+    setMsg(`Самолет ID ${aircraftId} удален`, true);
+    await loadReferenceData();
+  }catch(e){
+    setMsg(e.message || 'Не удалось удалить самолет', false);
+  }
+}
+
+async function addAirport(){
+  try{
+    const payload = await apiPost('/admin/airports', {
+      airport_name: document.getElementById('newAirportName').value.trim(),
+      city: document.getElementById('newAirportCity').value.trim(),
+      country: document.getElementById('newAirportCountry').value.trim()
+    });
+    setMsg(`Аэропорт добавлен: ID ${payload.airport.airport_id}`, true);
+    await loadReferenceData();
+  }catch(e){
+    setMsg(e.message || 'Не удалось добавить аэропорт', false);
+  }
+}
+
+async function deleteAirport(airportId){
+  const ok = window.confirm(`Удалить аэропорт ID ${airportId}?`);
+  if(!ok) return;
+  try{
+    await apiRequest(`/admin/airports/${airportId}`, { method: 'DELETE' });
+    setMsg(`Аэропорт ID ${airportId} удален`, true);
+    await loadReferenceData();
+  }catch(e){
+    setMsg(e.message || 'Не удалось удалить аэропорт', false);
+  }
+}
+
+loadFlightsForAdmin();
+loadTicketsForAdmin();
+loadReferenceData();
+</script>
+</div>
+</body>
+</html>
