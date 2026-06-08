@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Личный кабинет</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="app.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div id="app-navbar"></div>
+
+<div class="container cabinet-page">
+
+  <div class="cabinet-hero mb-4">
+    <div class="row g-3 align-items-center">
+      <div class="col-auto">
+        <div class="cabinet-avatar" id="profileAvatar"><i class="fa-solid fa-user"></i></div>
+      </div>
+      <div class="col">
+        <h1 class="cabinet-hero-name" id="heroName">Загрузка...</h1>
+        <div class="cabinet-meta mt-2 d-flex flex-wrap gap-3">
+          <span><i class="fa-solid fa-envelope me-1"></i><span id="heroEmail">—</span></span>
+          <span><i class="fa-solid fa-calendar-plus me-1"></i>Регистрация: <span id="heroRegistered">—</span></span>
+          <span><i class="fa-solid fa-suitcase-rolling me-1"></i>Бронирований: <span id="heroBookings">0</span></span>
+        </div>
+      </div>
+      <div class="col-12 col-md-auto">
+        <button class="btn btn-primary w-100" id="editProfileBtn" type="button">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Редактировать профиль
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-6">
+      <div class="cabinet-stat stat-card">
+        <div class="cabinet-stat-icon"><i class="fa-solid fa-ticket"></i></div>
+        <div class="cabinet-stat-value" id="statTotal">0</div>
+        <div class="cabinet-stat-label">Всего бронирований</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-6">
+      <div class="cabinet-stat stat-card">
+        <div class="cabinet-stat-icon"><i class="fa-solid fa-plane-departure"></i></div>
+        <div class="cabinet-stat-value" id="statActive">0</div>
+        <div class="cabinet-stat-label">Активных бронирований</div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs cabinet-tabs" id="cabinetTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="tab-profile-btn" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab">
+        <i class="fa-solid fa-user me-1"></i> Профиль
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-tickets-btn" data-bs-toggle="tab" data-bs-target="#tab-tickets" type="button" role="tab">
+        <i class="fa-solid fa-ticket me-1"></i> Мои билеты
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-history-btn" data-bs-toggle="tab" data-bs-target="#tab-history" type="button" role="tab">
+        <i class="fa-solid fa-clock-rotate-left me-1"></i> История бронирований
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content cabinet-panel" id="cabinetTabContent">
+
+    <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
+      <div class="cabinet-info-grid mb-3">
+        <div class="cabinet-info-item">
+          <div class="label">Имя</div>
+          <div class="value" id="profileName">—</div>
+        </div>
+        <div class="cabinet-info-item">
+          <div class="label">Email</div>
+          <div class="value" id="profileEmail">—</div>
+        </div>
+        <div class="cabinet-info-item">
+          <div class="label">Роль</div>
+          <div class="value" id="profileRole">—</div>
+        </div>
+        <div class="cabinet-info-item">
+          <div class="label">Дата регистрации</div>
+          <div class="value" id="profileRegistered">—</div>
+        </div>
+      </div>
+
+      <div class="cabinet-password-box">
+        <h5 class="mb-3"><i class="fa-solid fa-lock me-1"></i> Смена пароля</h5>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label" for="currentPassword">Текущий пароль</label>
+            <input id="currentPassword" class="form-control" type="password" autocomplete="current-password">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="newPassword">Новый пароль</label>
+            <input id="newPassword" class="form-control" type="password" autocomplete="new-password">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="confirmPassword">Подтверждение</label>
+            <input id="confirmPassword" class="form-control" type="password" autocomplete="new-password">
+          </div>
+        </div>
+        <div id="passwordMsg" class="small mt-2" style="display:none"></div>
+        <button class="btn btn-primary mt-3" id="changePasswordBtn" type="button">Сменить пароль</button>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="tab-tickets" role="tabpanel">
+      <div id="tickets" class="row g-3"></div>
+    </div>
+
+    <div class="tab-pane fade" id="tab-history" role="tabpanel">
+      <div class="cabinet-table-wrap">
+        <table class="table cabinet-table mb-0">
+          <thead>
+            <tr>
+              <th>Дата оформления</th>
+              <th>Рейс</th>
+              <th>Место</th>
+              <th>Статус</th>
+              <th>Номер бронирования</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <div id="historyEmpty" class="cabinet-empty" style="display:none">
+        <div><i class="fa-solid fa-inbox d-block"></i></div>
+        <div>История бронирований пуста</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content flight-card">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title"><i class="fa-solid fa-user-pen me-1"></i> Редактирование профиля</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label" for="editFirstName">Имя</label>
+          <input id="editFirstName" class="form-control" type="text">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="editLastName">Фамилия</label>
+          <input id="editLastName" class="form-control" type="text">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="editPhone">Телефон</label>
+          <input id="editPhone" class="form-control" type="tel" placeholder="+7 (999) 000-00-00">
+        </div>
+        <div id="editProfileMsg" class="small" style="display:none"></div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-primary" id="saveProfileBtn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="common.js"></script>
+<script>
+renderNavbar({ active: 'profile.html' });
+if (!requireAuth()) throw new Error('unauthorized');
+
+let profileData = null;
+let ticketsData = [];
+const editProfileModal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+
+function formatDate(value) {
+  if (!value) return '—';
+  return new Date(value).toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+function formatDateTime(value) {
+  if (!value) return '—';
+  return new Date(value).toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function fullName(passenger) {
+  if (!passenger) return 'Пользователь';
+  return `${passenger.first_name || ''} ${passenger.last_name || ''}`.trim() || 'Пользователь';
+}
+
+function roleLabel(role) {
+  if (role === 'admin') {
+    return '<span class="role-badge admin"><i class="fa-solid fa-shield-halved"></i> Администратор</span>';
+  }
+  return '<span class="role-badge user"><i class="fa-solid fa-user"></i> Пассажир</span>';
+}
+
+function statusBadge(status) {
+  const key = String(status || 'unknown').toLowerCase();
+  const labels = {
+    confirmed: 'Подтверждено',
+    issued: 'Выдан',
+    cancelled: 'Отменено',
+    pending: 'Ожидает',
+    scheduled: 'Запланирован'
+  };
+  const label = labels[key] || status || '—';
+  return `<span class="status-badge ${key}">${label}</span>`;
+}
+
+function updateStoredUser(patch) {
+  const user = { ...getStoredUser(), ...patch };
+  localStorage.setItem('user', JSON.stringify(user));
+}
+
+function renderProfile() {
+  if (!profileData) return;
+
+  const name = fullName(profileData.passenger);
+  const stats = profileData.stats || {};
+
+  document.getElementById('heroName').textContent = name;
+  document.getElementById('heroEmail').textContent = profileData.user.email || '—';
+  document.getElementById('heroRegistered').textContent = formatDate(profileData.user.created_at);
+  document.getElementById('heroBookings').textContent = stats.total_bookings || 0;
+
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileEmail').textContent = profileData.user.email || '—';
+  document.getElementById('profileRole').innerHTML = roleLabel(profileData.user.role);
+  document.getElementById('profileRegistered').textContent = formatDate(profileData.user.created_at);
+
+  document.getElementById('statTotal').textContent = stats.total_bookings || 0;
+  document.getElementById('statActive').textContent = stats.active_bookings || 0;
+
+  const initials = name.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('');
+  document.getElementById('profileAvatar').textContent = initials || 'U';
+}
+
+function renderTickets() {
+  const container = document.getElementById('tickets');
+
+  if (!ticketsData.length) {
+    container.innerHTML = `
+      <div class="col-12">
+        <div class="cabinet-empty">
+          <div><i class="fa-solid fa-ticket d-block"></i></div>
+          <div>У вас пока нет билетов</div>
+          <a href="flights.html" class="btn btn-primary mt-3">Найти рейс</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = ticketsData.map((t) => `
+    <div class="col-12 col-lg-6">
+      <article class="ticket-card">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+          <div>
+            <div class="ticket-card-flight">${t.flight_number}</div>
+            <div class="ticket-card-route mt-1">${t.departure_city} → ${t.arrival_city}</div>
+          </div>
+          ${statusBadge(t.booking_status)}
+        </div>
+        <div class="ticket-card-detail"><i class="fa-solid fa-calendar-days me-1"></i> Вылет: ${formatDateTime(t.scheduled_departure)}</div>
+        <div class="ticket-card-detail"><i class="fa-solid fa-chair me-1"></i> Место: ${t.seat_number} (${t.fare_class})</div>
+        <div class="ticket-card-detail"><i class="fa-solid fa-hashtag me-1"></i> Бронь: ${t.booking_reference}</div>
+        <div class="ticket-card-detail"><i class="fa-solid fa-building me-1"></i> ${t.airline_name || '—'}</div>
+        <div class="ticket-card-detail"><i class="fa-solid fa-plane me-1"></i> ${t.aircraft_type || '—'}</div>
+        <div class="ticket-card-detail"><i class="fa-solid fa-receipt me-1"></i> Билет: ${t.ticket_number}</div>
+      </article>
+    </div>
+  `).join('');
+}
+
+function renderHistory() {
+  const body = document.getElementById('historyBody');
+  const empty = document.getElementById('historyEmpty');
+
+  if (!ticketsData.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  body.innerHTML = ticketsData.map((t) => `
+    <tr>
+      <td>${formatDateTime(t.booking_date)}</td>
+      <td><strong>${t.flight_number}</strong><div class="text-muted small">${t.departure_city} → ${t.arrival_city}</div></td>
+      <td>${t.seat_number}</td>
+      <td>${statusBadge(t.booking_status)}</td>
+      <td><code>${t.booking_reference}</code></td>
+    </tr>
+  `).join('');
+}
+
+function openEditProfileModal() {
+  const passenger = profileData?.passenger || {};
+  document.getElementById('editFirstName').value = passenger.first_name || '';
+  document.getElementById('editLastName').value = passenger.last_name || '';
+  document.getElementById('editPhone').value = passenger.phone_number || '';
+  document.getElementById('editProfileMsg').style.display = 'none';
+  editProfileModal.show();
+}
+
+function showInlineMessage(elId, text, ok) {
+  const el = document.getElementById(elId);
+  el.style.display = 'block';
+  el.className = `small mt-2 ${ok ? 'text-success' : 'text-danger'}`;
+  el.textContent = text;
+}
+
+async function loadCabinet() {
+  const [profile, tickets] = await Promise.all([
+    apiGet('/profile'),
+    apiGet('/my-tickets')
+  ]);
+
+  profileData = profile;
+  ticketsData = tickets;
+  renderProfile();
+  renderTickets();
+  renderHistory();
+}
+
+document.getElementById('editProfileBtn').addEventListener('click', openEditProfileModal);
+
+document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+  const first_name = document.getElementById('editFirstName').value.trim();
+  const last_name = document.getElementById('editLastName').value.trim();
+  const phone_number = document.getElementById('editPhone').value.trim();
+
+  if (!first_name || !last_name) {
+    showInlineMessage('editProfileMsg', 'Заполните имя и фамилию', false);
+    return;
+  }
+
+  try {
+    const result = await apiPatch('/profile', { first_name, last_name, phone_number });
+    profileData.passenger = result.passenger;
+    updateStoredUser(result.user);
+    renderProfile();
+    editProfileModal.hide();
+  } catch (e) {
+    showInlineMessage('editProfileMsg', e.message || 'Не удалось сохранить профиль', false);
+  }
+});
+
+document.getElementById('changePasswordBtn').addEventListener('click', async () => {
+  const current_password = document.getElementById('currentPassword').value;
+  const new_password = document.getElementById('newPassword').value;
+  const confirm_password = document.getElementById('confirmPassword').value;
+
+  if (!current_password || !new_password) {
+    showInlineMessage('passwordMsg', 'Заполните все поля пароля', false);
+    return;
+  }
+  if (new_password !== confirm_password) {
+    showInlineMessage('passwordMsg', 'Новый пароль и подтверждение не совпадают', false);
+    return;
+  }
+
+  try {
+    await apiPost('/profile/password', { current_password, new_password });
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    showInlineMessage('passwordMsg', 'Пароль успешно изменён', true);
+  } catch (e) {
+    showInlineMessage('passwordMsg', e.message || 'Не удалось сменить пароль', false);
+  }
+});
+
+loadCabinet().catch((e) => {
+  if (e.status === 401) {
+    logout();
+    return;
+  }
+  document.querySelector('.cabinet-page').innerHTML = `
+    <div class="cabinet-empty">
+      <div><i class="fa-solid fa-triangle-exclamation d-block"></i></div>
+      <div>Не удалось загрузить личный кабинет</div>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>
